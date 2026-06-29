@@ -9,11 +9,15 @@ A comprehensive full-stack application combining multiple backend services (Fast
 **If someone shared this project with you:**
 
 1. **Install prerequisites**: Docker Desktop, Python 3.11+, Flutter 3.10+ (see [Prerequisites](#-prerequisites))
-2. **Read setup guide**: Open [`GETTING_STARTED.md`](./GETTING_STARTED.md) and follow steps 1-10
+2. **Read setup guide**: Open [`GETTING_STARTED.md`](./GETTING_STARTED.md) and follow the configuration steps
 3. **One config change**: Update your IP address in `Daily_Utility_Tool_Frontend/lib/api_services/api_routes.dart`
 4. **Run it**: Execute `.\start-all.ps1` in PowerShell
 
-That's it! Everything else works automatically.
+That's it! The script automatically:
+- ✅ Installs Python dependencies (first time)
+- ✅ Starts/restarts databases (even after computer restart)
+- ✅ Starts all backend services
+- ✅ Configures networking
 
 ---
 
@@ -43,15 +47,21 @@ That's it! Everything else works automatically.
 ## ⚡ Quick Commands
 
 ```powershell
-# Start all services
+# Start all services (auto-installs dependencies first time)
 .\start-all.ps1
 
-# Stop all services
+# Stop all services (keeps databases running)
 .\stop-all.ps1
 
 # Start frontend (in separate terminal)
 cd Daily_Utility_Tool_Frontend
+flutter pub get              # First time only
 flutter run -d chrome
+```
+
+**After Computer Restart:**
+```powershell
+.\start-all.ps1              # Automatically restarts databases
 ```
 
 ## 📍 Access Points
@@ -146,6 +156,16 @@ netstat -ano | findstr ":8000"
 netstat -ano | findstr ":80"
 ```
 
+### Dependencies not installing?
+```powershell
+# Manually install Python dependencies
+cd Daily_Utility_Tool
+pip install -r requirements.txt
+
+# Delete marker file to trigger reinstall
+del ..\.daily_util_deps_installed
+```
+
 ### Can't access the API?
 ```powershell
 # Find your IP address
@@ -158,15 +178,14 @@ docker ps | findstr nginx
 docker restart nginx
 ```
 
-### Database connection errors?
+### Database connection errors after restart?
 ```powershell
-# Check if databases are running
-docker ps | findstr postgres
-docker ps | findstr redis
+# The script should auto-start databases, but if not:
+docker start postgres
+docker start redis
 
-# Start databases
-cd Database
-docker compose up -d
+# Or use the startup script
+.\start-all.ps1
 ```
 
 More troubleshooting: See [`GETTING_STARTED.md`](./GETTING_STARTED.md#troubleshooting)

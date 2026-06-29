@@ -28,11 +28,27 @@ Write-Output ""
 
 Write-Output "Step 2/5: Checking database services..."
 # Check for exact container names (postgres and redis for Minima)
-$postgresCheck = docker ps --filter name=^postgres$ --filter status=running -q
-$redisCheck = docker ps --filter name=^redis$ --filter status=running -q
+$postgresRunning = docker ps --filter name=^postgres$ --filter status=running -q
+$redisRunning = docker ps --filter name=^redis$ --filter status=running -q
 
-if (-not $postgresCheck -or -not $redisCheck) {
-    Write-Output "  Starting database services..."
+# Check if containers exist but are stopped
+$postgresStopped = docker ps -a --filter name=^postgres$ --filter status=exited -q
+$redisStopped = docker ps -a --filter name=^redis$ --filter status=exited -q
+
+if ($postgresStopped -or $redisStopped) {
+    Write-Output "  Database containers exist but stopped. Starting them..."
+    if ($postgresStopped) {
+        docker start postgres | Out-Null
+        Write-Output "  PostgreSQL started"
+    }
+    if ($redisStopped) {
+        docker start redis | Out-Null
+        Write-Output "  Redis started"
+    }
+    Write-Output "  Waiting for databases to be ready..."
+    Start-Sleep -Seconds 5
+} elseif (-not $postgresRunning -or -not $redisRunning) {
+    Write-Output "  Creating and starting database services..."
     Push-Location Database
     docker compose up -d
     Pop-Location
@@ -46,6 +62,21 @@ Write-Output ""
 
 Write-Output "Step 3/6: Starting Daily Utility Tool backend..."
 Push-Location Daily_Utility_Tool
+
+# Check if dependencies are installed
+$depsInstalled = Test-Path "$PSScriptRoot\.daily_util_deps_installed"
+if (-not $depsInstalled) {
+    Write-Output "  First time setup detected..."
+    Write-Output "  Installing Python dependencies..."
+    pip install -r requirements.txt --quiet
+    if ($LASTEXITCODE -eq 0) {
+        Write-Output "  Dependencies installed successfully"
+        New-Item -Path "$PSScriptRoot\.daily_util_deps_installed" -ItemType File -Force | Out-Null
+    } else {
+        Write-Output "  [WARNING] Failed to install dependencies. Please run manually:"
+        Write-Output "  cd Daily_Utility_Tool && pip install -r requirements.txt"
+    }
+}
 
 # Check if already running
 $dailyUtilRunning = netstat -ano | findstr ":8000" | findstr "LISTENING"

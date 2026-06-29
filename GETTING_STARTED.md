@@ -132,7 +132,9 @@ cd C:\Users\<YourUsername>\Desktop\Integrate
 
 #### 1. Daily Utility Tool Backend
 
-Navigate to the backend folder and install dependencies:
+**Good news!** Dependencies are installed automatically when you run `start-all.ps1` for the first time.
+
+**Optional - Manual Installation** (if you want to run the backend separately):
 
 ```powershell
 cd Daily_Utility_Tool
@@ -228,6 +230,24 @@ POSTGRES_DB=url_shortener
 
 ## Starting the Application
 
+### ⚡ Automated Features
+
+The startup script now includes these automatic features to make setup easier:
+
+1. **Auto-installs Python dependencies** (first run only)
+   - No need to manually run `pip install`
+   - Creates a marker file to skip on subsequent runs
+
+2. **Auto-starts databases after computer restart**
+   - Detects if containers are stopped
+   - Restarts them automatically
+   - Preserves all your data
+
+3. **Network configuration**
+   - Creates Docker network if needed
+   - Configures DNS resolution
+   - Restarts Nginx to refresh connections
+
 ### Method 1: Automated Startup (Recommended)
 
 From the `Integrate` folder, run:
@@ -238,11 +258,14 @@ From the `Integrate` folder, run:
 
 This script will:
 1. ✅ Create Docker network
-2. ✅ Start PostgreSQL and Redis
-3. ✅ Start Daily Utility Tool backend
-4. ✅ Start Minima backend and worker
-5. ✅ Start Nginx reverse proxy
-6. ✅ Configure DNS resolution
+2. ✅ Check and start databases (PostgreSQL and Redis)
+   - If stopped after computer restart: Starts them
+   - If not created yet: Creates and starts them
+3. ✅ Install Python dependencies (first time only)
+4. ✅ Start Daily Utility Tool backend
+5. ✅ Start Minima backend and worker
+6. ✅ Start Nginx reverse proxy
+7. ✅ Configure DNS resolution
 
 **Expected Output:**
 
@@ -258,8 +281,12 @@ Step 1/4: Creating shared Docker network...
 
 Step 2/5: Checking database services...
   Database already running
+  (or "Database containers exist but stopped. Starting them...")
+  (or "Creating and starting database services...")
 
 Step 3/6: Starting Daily Utility Tool backend...
+  (First time: "Installing Python dependencies...")
+  (First time: "Dependencies installed successfully")
   Starting backend as background process...
   Backend started (PID: 12345)
 
@@ -422,13 +449,22 @@ Status:
 
 ### Stopping Databases (Optional)
 
-⚠️ **Warning**: This will stop the databases. Data in memory will be lost.
+⚠️ **Warning**: Normally you don't need to stop databases - they're designed to stay running.
+
+**When to stop databases:**
+- You need to free up system resources
+- You're backing up or moving data
+- You're troubleshooting database issues
 
 ```powershell
 cd Database
-docker compose down
+docker compose stop    # Stops but keeps data
+# OR
+docker compose down    # Stops and removes containers (data persists in volumes)
 cd ..
 ```
+
+**Note**: After computer restart, databases will be stopped automatically by Docker. The `start-all.ps1` script will detect and restart them automatically.
 
 ### Method 2: Manual Shutdown
 
@@ -640,17 +676,27 @@ docker logs backend --tail 20
 ### Development Workflow
 
 ```powershell
-# Start services
+# Start services (installs dependencies automatically on first run)
 .\start-all.ps1
 
 # Start frontend in dev mode (new terminal)
 cd Daily_Utility_Tool_Frontend
+flutter pub get          # First time only
 flutter run -d chrome
 
 # Make changes to code (hot reload enabled)
 
 # When done
 .\stop-all.ps1
+```
+
+**After Computer Restart:**
+```powershell
+# Just run this - it handles everything automatically
+.\start-all.ps1
+
+# Databases will be detected as stopped and restarted
+# Dependencies are already installed (skipped)
 ```
 
 ### Production Deployment
