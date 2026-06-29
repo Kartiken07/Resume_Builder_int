@@ -1,0 +1,19 @@
+name: url-shortener-nginx
+services:
+  nginx:
+    container_name: nginx
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - url-shortener-network
+    restart: unless-stopped
+
+networks:
+  url-shortener-network:
+    external: true
+    name: url-shortener-network

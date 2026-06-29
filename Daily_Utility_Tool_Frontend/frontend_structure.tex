@@ -1,0 +1,157 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{titlesec}
+
+% Configure hyperlinks
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Frontend Folder Structure},
+}
+
+% Title formatting
+\titleformat{\section}
+{\normalfont\Large\bfseries\color{blue!70!black}}{\thesection}{1em}{}
+\titleformat{\subsection}
+{\normalfont\large\bfseries\color{blue!50!black}}{\thesubsection}{1em}{}
+
+% Document Information
+\title{\textbf{Frontend Folder Structure} \\ \Large Daily Utility Tools Application}
+\author{Flutter Application}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Overview}
+This document describes the high-level folder structure of the Frontend Flutter application for the Daily Utility Tools project.
+
+\section{Root Level Folders}
+
+\subsection{lib/}
+\textbf{Purpose:} Contains all the Dart application source code.
+
+This is the main application folder where all the Flutter/Dart code lives.
+
+\subsubsection{lib/api\_services/}
+Handles communication with the backend API. Contains API route definitions and service classes for each feature.
+
+\subsubsection{lib/cards/}
+Reusable card components for displaying results. Each feature has its own subfolder with result display cards.
+
+\subsubsection{lib/models/}
+Data models and data transfer objects (DTOs) that represent the structure of data used in the app.
+
+\subsubsection{lib/notifiers/}
+State management logic using ChangeNotifier pattern. Each feature has its own notifier to manage state.
+
+\subsubsection{lib/providers/}
+Provider setup for dependency injection. Links notifiers to the widget tree.
+
+\subsubsection{lib/routes/}
+Navigation and routing configuration. Defines app routes and router setup.
+
+\subsubsection{lib/screens/}
+Main screens/pages of the application. Each utility tool has its own screen.
+
+\subsubsection{lib/theme/}
+Application theming configuration including colors, fonts, and styling.
+
+\subsubsection{lib/widgets/}
+Reusable UI components organized by feature. Each feature has its own subfolder with custom widgets.
+
+\subsection{assets/}
+\textbf{Purpose:} Static resources like images, fonts, and other files.
+
+Contains all non-code resources that the app uses.
+
+\subsubsection{assets/images/}
+Image files used throughout the application (icons, backgrounds, illustrations).
+
+\subsection{test/}
+\textbf{Purpose:} Testing code including unit tests and widget tests.
+
+Contains all test files for the application.
+
+\subsection{android/}
+\textbf{Purpose:} Android platform-specific configuration and native code.
+
+Contains Gradle build files, Android manifest, and native Android code needed for the app to run on Android devices.
+
+\subsection{ios/}
+\textbf{Purpose:} iOS platform-specific configuration and native code.
+
+Contains Xcode project files, Info.plist, and native iOS code needed for the app to run on iOS devices.
+
+\subsection{web/}
+\textbf{Purpose:} Web platform-specific configuration.
+
+Contains HTML, manifest, and web assets for running the app as a Progressive Web App (PWA).
+
+\subsection{windows/}
+\textbf{Purpose:} Windows platform-specific configuration and native code.
+
+Contains CMake configuration and C++ code for running the app on Windows desktop.
+
+\subsection{linux/}
+\textbf{Purpose:} Linux platform-specific configuration and native code.
+
+Contains CMake configuration and C++ code for running the app on Linux desktop.
+
+\subsection{macos/}
+\textbf{Purpose:} macOS platform-specific configuration and native code.
+
+Contains Xcode project files and Swift code for running the app on macOS.
+
+\section{Application Architecture}
+
+\subsection{How the Folders Work Together}
+
+\begin{enumerate}
+    \item \textbf{screens/} contain the main UI pages users see
+    \item \textbf{widgets/} contain reusable UI components used in screens
+    \item \textbf{cards/} contain specialized components for displaying results
+    \item \textbf{notifiers/} manage the state and business logic
+    \item \textbf{providers/} connect notifiers to the UI
+    \item \textbf{api\_services/} handle backend communication
+    \item \textbf{models/} define data structures
+    \item \textbf{routes/} handle navigation between screens
+    \item \textbf{theme/} provides consistent styling
+\end{enumerate}
+
+\subsection{Feature Organization}
+
+Each utility tool (Age Calculator, EMI Calculator, Barcode Generator, QR Generator, Unit Converter) follows the same pattern:
+
+\begin{itemize}
+    \item One screen in \texttt{screens/}
+    \item Custom widgets in \texttt{widgets/[feature\_name]/}
+    \item Result cards in \texttt{cards/[feature\_name]/}
+    \item One model in \texttt{models/}
+    \item One notifier in \texttt{notifiers/}
+    \item One provider in \texttt{providers/}
+    \item One service in \texttt{api\_services/services/}
+\end{itemize}
+
+\section{Platform Folders Purpose}
+
+All platform folders (\texttt{android/}, \texttt{ios/}, \texttt{web/}, \texttt{windows/}, \texttt{linux/}, \texttt{macos/}) serve the same purpose: they contain platform-specific code and configuration that Flutter needs to run the app on that particular platform. You generally don't modify these unless you're adding native features.
+
+\section{Summary}
+
+\begin{itemize}
+    \item \textbf{lib/} = Your app code
+    \item \textbf{assets/} = Images and resources
+    \item \textbf{test/} = Tests
+    \item \textbf{Platform folders} = Configuration for each OS
+\end{itemize}
+
+\end{document}

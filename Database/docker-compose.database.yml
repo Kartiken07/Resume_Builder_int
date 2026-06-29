@@ -1,0 +1,31 @@
+name: url-shortener-database
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:15
+    environment:
+      POSTGRES_DB: url_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5650:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - url-shortener-network
+
+  redis:
+    container_name: redis
+    image: redis:7
+    ports:
+      - "6379:6379"
+    networks:
+      - url-shortener-network
+
+volumes:
+  postgres_data:
+
+networks:
+  url-shortener-network:
+    external: true
+    name: url-shortener-network

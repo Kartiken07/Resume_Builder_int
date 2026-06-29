@@ -1,0 +1,40 @@
+name: url-shortener-api
+services:
+  backend:
+    container_name: backend
+    build: ./url_shortener_backend
+    expose:
+      - "8000"
+    volumes:
+      - ./url_shortener_backend:/app
+      - /app/.venv
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgresql://user:password@postgres/url_db}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - REDIS_HOST=redis
+      - API_BASE_URL=${API_BASE_URL}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}
+      - HOST_HOSTNAME=${COMPUTERNAME:-${HOSTNAME:-}}
+    networks:
+      - url-shortener-network
+
+  worker:
+    container_name: worker
+    build: ./url_shortener_backend
+    command: python -m poetry run celery -A tasks.celery_app worker --loglevel=info
+    volumes:
+      - ./url_shortener_backend:/app
+      - /app/.venv
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgresql://user:password@postgres/url_db}
+      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
+      - REDIS_HOST=redis
+      - API_BASE_URL=${API_BASE_URL}
+      - HOST_HOSTNAME=${COMPUTERNAME:-${HOSTNAME:-}}
+    networks:
+      - url-shortener-network
+
+networks:
+  url-shortener-network:
+    external: true
+    name: url-shortener-network
