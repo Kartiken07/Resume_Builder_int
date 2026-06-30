@@ -1,0 +1,26 @@
+name: filesharesystem-api
+
+services:
+  filesharesystem_backend:
+    container_name: filesharesystem_backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: ./backend/.env
+    expose:
+      - "8000"
+    volumes:
+      - ./backend:/app          # hot reload in dev
+      - fileshare_upload_data:/app/uploads  # persistent file storage
+    networks:
+      - url-shortener-network
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  fileshare_upload_data:
+
+networks:
+  url-shortener-network:
+    external: true
+    name: url-shortener-network

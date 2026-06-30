@@ -1,9 +1,9 @@
-﻿param (
+param (
     [string]$Domain = ""
 )
 
 Write-Output "========================================="
-Write-Output "  URL Shortener - Master Startup"
+Write-Output "  ToolHub - Master Startup"
 Write-Output "========================================="
 Write-Output ""
 
@@ -21,12 +21,12 @@ if (-not $ip) {
 Write-Output "Detected IP: $ip"
 Write-Output ""
 
-Write-Output "Step 1/4: Creating shared Docker network..."
+Write-Output "Step 1/7: Creating shared Docker network..."
 docker network create url-shortener-network 2>$null
 Write-Output "  Network ready"
 Write-Output ""
 
-Write-Output "Step 2/5: Checking database services..."
+Write-Output "Step 2/7: Checking database services..."
 # Check for exact container names (postgres and redis for Minima)
 $postgresRunning = docker ps --filter name=^postgres$ --filter status=running -q
 $redisRunning = docker ps --filter name=^redis$ --filter status=running -q
@@ -60,7 +60,7 @@ if ($postgresStopped -or $redisStopped) {
 }
 Write-Output ""
 
-Write-Output "Step 3/6: Starting Daily Utility Tool backend..."
+Write-Output "Step 3/7: Starting Daily Utility Tool backend..."
 Push-Location Daily_Utility_Tool
 
 # Check if dependencies are installed
@@ -94,23 +94,32 @@ if (-not $dailyUtilRunning) {
 Pop-Location
 Write-Output ""
 
-Write-Output "Step 4/6: Starting Minima backend API..."
+Write-Output "Step 4/7: Starting Minima backend API..."
 Push-Location Minima
 docker compose -f docker-compose.api.yml up -d
 Pop-Location
-Write-Output "  Backend API started"
+Write-Output "  Minima Backend API started"
 Write-Output "  Waiting for backend to be ready..."
 Start-Sleep -Seconds 5
 Write-Output ""
 
-Write-Output "Step 5/6: Starting Nginx reverse proxy..."
+Write-Output "Step 5/7: Starting File Sharing backend API..."
+Push-Location FileSharing
+docker compose -f docker-compose.api.yml up -d
+Pop-Location
+Write-Output "  File Sharing Backend API started"
+Write-Output "  Waiting for backend to be ready..."
+Start-Sleep -Seconds 5
+Write-Output ""
+
+Write-Output "Step 6/7: Starting Nginx reverse proxy..."
 Push-Location Nginx
 docker compose up -d
 Pop-Location
 Write-Output "  Nginx started"
 Write-Output ""
 
-Write-Output "Step 6/6: Ensuring Nginx can connect to backends..."
+Write-Output "Step 7/7: Ensuring Nginx can connect to backends..."
 Write-Output "  Restarting Nginx to refresh DNS resolution..."
 docker restart nginx 2>&1 | Out-Null
 Start-Sleep -Seconds 2
@@ -122,14 +131,18 @@ Write-Output "  All Services Started Successfully!"
 Write-Output "========================================="
 Write-Output ""
 Write-Output "Services Running:"
-Write-Output "  ✅ PostgreSQL          : Database"
-Write-Output "  ✅ Redis               : Cache"
-Write-Output "  ✅ Daily Utility Tool  : Port 8000"
-Write-Output "  ✅ Backend API         : Containerized"
-Write-Output "  ✅ Nginx               : Reverse Proxy"
+Write-Output "  [OK] PostgreSQL             : Database (shared)"
+Write-Output "  [OK] Redis                  : Cache"
+Write-Output "  [OK] Daily Utility Tool     : Port 8000"
+Write-Output "  [OK] Minima Backend API     : Containerized"
+Write-Output "  [OK] File Sharing Backend   : Containerized"
+Write-Output "  [OK] Nginx                  : Reverse Proxy"
 Write-Output ""
 Write-Output "Access Your Application:"
-Write-Output "  API Documentation : http://$ip/docs"
-Write-Output "  Health Check      : http://$ip/health"
-Write-Output "  Base URL          : http://$ip"
+Write-Output "  API Documentation (DUT)    : http://$ip/api/docs"
+Write-Output "  Minima (URL Shortener)     : http://$ip/"
+Write-Output "  File Sharing API           : http://$ip/fileshare/docs"
+Write-Output "  File Sharing Health        : http://$ip/fileshare/health"
+Write-Output "  Nginx Health Check         : http://$ip/health"
+Write-Output "  Base URL                   : http://$ip"
 Write-Output ""

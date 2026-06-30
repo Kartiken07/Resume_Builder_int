@@ -88,10 +88,10 @@ class MainHomeScreen extends StatelessWidget {
                       ).animate().fade(delay: 500.ms).slideY(begin: 0.1),
                       
                       ProjectCard(
-                        title: "Coming Soon",
-                        description: "Stay tuned for updates",
-                        icon: LucideIcons.sparkles,
-                        isComingSoon: true,
+                        title: "File Sharing",
+                        description: "Upload, Share & Download Files",
+                        icon: LucideIcons.cloudUpload,
+                        onTap: () => context.go('/file-sharing'),
                       ).animate().fade(delay: 600.ms).slideY(begin: 0.1),
                     ],
                   ),
