@@ -93,6 +93,13 @@ class MainHomeScreen extends StatelessWidget {
                         icon: LucideIcons.cloudUpload,
                         onTap: () => context.go('/file-sharing'),
                       ).animate().fade(delay: 600.ms).slideY(begin: 0.1),
+
+                      ProjectCard(
+                        title: "Resume Builder",
+                        description: "AI Resume Builder & Document Suite",
+                        icon: LucideIcons.fileText,
+                        onTap: () => context.go('/resume-builder'),
+                      ).animate().fade(delay: 700.ms).slideY(begin: 0.1),
                     ],
                   ),
 

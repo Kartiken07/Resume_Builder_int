@@ -4,6 +4,7 @@ import '../screens/main_home_screen.dart';
 import 'Daily_Utility_Tool/app_router.dart';
 import 'Minima/app_router.dart';
 import 'FileSharing/app_router.dart';
+import 'ResumeBuilder/app_router.dart';
 
 /// Top-level router for the multi-project hub.
 ///
@@ -26,6 +27,7 @@ abstract final class AppRouter {
       ...dailyUtilityToolRoutes,
       ...minimaRoutes,
       ...fileSharingRoutes,
+      ...resumeBuilderRoutes,
 
       // Add future project routes here:
       // ...anotherProjectRoutes,

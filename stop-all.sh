@@ -56,6 +56,39 @@ echo "Stopping File Sharing Backend API..."
 echo "  [OK] File Sharing Backend API stopped"
 echo ""
 
+echo "Stopping ResumeBuilder backend..."
+STOPPED_RB=0
+PID_FILE_RB="ResumeBuilder/.resume_builder_pid"
+
+if [ -f "$PID_FILE_RB" ]; then
+    STORED_PID=$(cat "$PID_FILE_RB")
+    if ps -p $STORED_PID > /dev/null; then
+        kill $STORED_PID 2>/dev/null
+        sleep 1
+        if ! ps -p $STORED_PID > /dev/null; then
+            echo "  [OK] ResumeBuilder backend stopped (PID: $STORED_PID)"
+            STOPPED_RB=1
+        fi
+    fi
+    rm -f "$PID_FILE_RB"
+fi
+
+if [ $STOPPED_RB -eq 0 ]; then
+    PIDS=$(lsof -ti:8001)
+    if [ -n "$PIDS" ]; then
+        for PID in $PIDS; do
+            kill $PID 2>/dev/null
+            echo "  [OK] Stopped process on port 8001 (PID: $PID)"
+            STOPPED_RB=1
+        done
+    fi
+fi
+
+if [ $STOPPED_RB -eq 0 ]; then
+    echo "  [INFO] No ResumeBuilder backend process found"
+fi
+echo ""
+
 echo "========================================="
 echo "  Services Stopped Successfully!"
 echo "========================================="
@@ -63,6 +96,7 @@ echo ""
 echo "Status:"
 echo "  [X] Nginx                   : Stopped"
 echo "  [X] Daily Utility Tool      : Stopped"
+echo "  [X] ResumeBuilder           : Stopped"
 echo "  [X] Minima Backend API      : Stopped"
 echo "  [X] File Sharing Backend    : Stopped"
 echo "  [OK] PostgreSQL             : Still running (data preserved)"
