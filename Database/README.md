@@ -1,11 +1,19 @@
 # Database Services
 
-Independent database infrastructure for URL Shortener application.
+Shared database infrastructure for all ToolHub projects.
 
 ## Services
 
 - **PostgreSQL 15**: Main database (Port 5650)
 - **Redis 7**: Cache and message broker (Port 6379)
+
+## Databases
+
+The PostgreSQL container automatically creates these databases on first startup:
+
+- **url_db**: Used by Minima (URL Shortener)
+- **filesharingsystem**: Used by FileSharing System
+- **postgres**: Default admin database
 
 ## Quick Start
 
@@ -35,11 +43,16 @@ docker compose -f docker-compose.database.yml ps
 ```
 Host: localhost
 Port: 5650
-Database: url_db
 User: user
 Password: password
 
-Connection String: postgresql://user:password@localhost:5650/url_db
+Databases:
+  - url_db (Minima URL Shortener)
+  - filesharingsystem (FileSharing System)
+
+Connection String Examples:
+  postgresql://user:password@localhost:5650/url_db
+  postgresql://user:password@localhost:5650/filesharingsystem
 ```
 
 **Redis:**
@@ -54,12 +67,20 @@ Connection String: redis://localhost:6379/0
 
 ### Backup Database
 ```powershell
-docker exec postgres pg_dump -U user url_db > backup.sql
+# Backup Minima database
+docker exec postgres pg_dump -U user url_db > backup_minima.sql
+
+# Backup FileSharing database
+docker exec postgres pg_dump -U user filesharingsystem > backup_filesharing.sql
 ```
 
 ### Restore Database
 ```powershell
-docker exec -i postgres psql -U user url_db < backup.sql
+# Restore Minima database
+docker exec -i postgres psql -U user url_db < backup_minima.sql
+
+# Restore FileSharing database
+docker exec -i postgres psql -U user filesharingsystem < backup_filesharing.sql
 ```
 
 ### Clear All Data
@@ -71,10 +92,28 @@ docker compose -f docker-compose.database.yml down -v
 
 Edit `.env` file to change database credentials:
 ```env
-POSTGRES_DB=url_db
+POSTGRES_DB=postgres
 POSTGRES_USER=user
 POSTGRES_PASSWORD=password
 ```
+
+**Note**: Individual project databases are created automatically via `init-databases.sh`. To add new databases, edit that script and recreate the container.
+
+## Adding New Project Databases
+
+To add a database for a new project:
+
+1. Edit `init-databases.sh`
+2. Add your database creation statement:
+   ```sql
+   SELECT 'CREATE DATABASE your_new_db'
+   WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'your_new_db')\gexec
+   
+   GRANT ALL PRIVILEGES ON DATABASE your_new_db TO "$POSTGRES_USER";
+   ```
+3. **If postgres container already exists**, either:
+   - Manually create via: `docker exec postgres psql -U user -d postgres -c "CREATE DATABASE your_new_db;"`
+   - Or destroy and recreate: `docker compose -f docker-compose.database.yml down -v` then start again
 
 ## Network
 

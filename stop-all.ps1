@@ -1,8 +1,8 @@
-# Master Stop Script for URL Shortener
-# Stops Backend API, Daily Utility Tool, and Nginx, but PRESERVES Database
+# Master Stop Script for ToolHub
+# Stops Backend APIs, Daily Utility Tool, and Nginx, but PRESERVES Database
 
 Write-Output "========================================="
-Write-Output "  URL Shortener - Stopping Services"
+Write-Output "  ToolHub - Stopping Services"
 Write-Output "========================================="
 Write-Output ""
 
@@ -61,11 +61,18 @@ if (-not $stopped) {
 }
 Write-Output ""
 
-Write-Output "Stopping Backend API..."
+Write-Output "Stopping Minima Backend API..."
 Push-Location "$PSScriptRoot\Minima"
 docker compose -f docker-compose.api.yml down
 Pop-Location
-Write-Output "  [OK] Backend API stopped"
+Write-Output "  [OK] Minima Backend API stopped"
+Write-Output ""
+
+Write-Output "Stopping File Sharing Backend API..."
+Push-Location "$PSScriptRoot\FileSharing"
+docker compose -f docker-compose.api.yml down
+Pop-Location
+Write-Output "  [OK] File Sharing Backend API stopped"
 Write-Output ""
 
 Write-Output "========================================="
@@ -73,12 +80,12 @@ Write-Output "  Services Stopped Successfully!"
 Write-Output "========================================="
 Write-Output ""
 Write-Output "Status:"
-Write-Output "  [X] Nginx               : Stopped"
-Write-Output "  [X] Daily Utility Tool  : Stopped"
-Write-Output "  [X] Backend API         : Stopped"
-Write-Output "  [X] Celery Worker       : Stopped"
-Write-Output "  [OK] PostgreSQL         : Still running (data preserved)"
-Write-Output "  [OK] Redis              : Still running (cache preserved)"
+Write-Output "  [X] Nginx                   : Stopped"
+Write-Output "  [X] Daily Utility Tool      : Stopped"
+Write-Output "  [X] Minima Backend API      : Stopped"
+Write-Output "  [X] File Sharing Backend    : Stopped"
+Write-Output "  [OK] PostgreSQL             : Still running (data preserved)"
+Write-Output "  [OK] Redis                  : Still running (cache preserved)"
 Write-Output ""
 Write-Output "Database is kept running to preserve your data."
 Write-Output ""

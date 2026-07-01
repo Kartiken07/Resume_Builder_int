@@ -1,0 +1,37 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+nosetests.xml
+pylintrc
+.pylintrc
+.pylintrc-def
+
+# Flutter generated files (root level references if any)
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# Local marker and dependency cache
+Daily_Utility_Tool/.daily_util_deps_installed
+Daily_Utility_Tool/.daily_util_pid
+uvicorn.log
+
+# Uploaded media/files
+FileSharing/backend/uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
