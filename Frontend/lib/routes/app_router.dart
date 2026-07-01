@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../screens/main_home_screen.dart';
 import 'Daily_Utility_Tool/app_router.dart';
 import 'Minima/app_router.dart';
+import 'FileSharing/app_router.dart';
 
 /// Top-level router for the multi-project hub.
 ///
@@ -24,6 +25,7 @@ abstract final class AppRouter {
       // ── Projects ──────────────────────────────────────────────────────────
       ...dailyUtilityToolRoutes,
       ...minimaRoutes,
+      ...fileSharingRoutes,
 
       // Add future project routes here:
       // ...anotherProjectRoutes,
