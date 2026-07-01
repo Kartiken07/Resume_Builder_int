@@ -35,3 +35,5 @@ FileSharing/backend/uploads/
 # OS files
 .DS_Store
 Thumbs.db
+ResumeBuilder/uploads/
+ResumeBuilder/.env
